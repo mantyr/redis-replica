@@ -1,4 +1,4 @@
-package main
+package rdb_test
 
 import (
 	"bufio"
@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 	"testing"
+	"github.com/mantyr/redis-replica/rdb"
 )
 
 func TestFilterRDB(t *testing.T) {
@@ -34,14 +35,14 @@ func TestFilterRDB(t *testing.T) {
 			description:   "3: RDB broken, no magic",
 			rdb:           "NOTREDIS",
 			expected:      "",
-			expectedError: ErrWrongSignature,
+			expectedError: rdb.ErrWrongSignature,
 			filter:        func(string) bool { return true },
 		},
 		{
 			description:   "4: RDB version unsupported",
-			rdb:           "REDIS0007",
+			rdb:           "REDIS0008",
 			expected:      "",
-			expectedError: ErrVersionUnsupported,
+			expectedError: rdb.ErrVersionUnsupported,
 			filter:        func(string) bool { return true },
 		},
 		{
@@ -108,6 +109,13 @@ func TestFilterRDB(t *testing.T) {
 			expected:    "REDIS0006\xfe\x00\x00\xc3\x12/\x01aa \x00\x00d\xe0\n\x00\x00e\xe0\n\x00\x01ee\x02x3\x00\xc3\x130\x01aa\xe0\a\x00\x00b\xe0\b\x00\x00c\xe0\x00\x00\x01cc\x02x1\xff\x8f\xa2\xae٠Y\xa8N\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff",
 			filter:      func(key string) bool { return strings.HasPrefix(key, "aaaa") },
 		},
+		{
+			description:   "4: RDB version 7",
+			rdb:           "REDIS0007",
+			expected:      "",
+			expectedError: io.EOF,
+			filter:        func(string) bool { return true },
+		},
 	}
 
 	for _, test := range tests {
@@ -115,7 +123,7 @@ func TestFilterRDB(t *testing.T) {
 		hadError := false
 
 		go func() {
-			err := FilterRDB(bufio.NewReader(bytes.NewBufferString(test.rdb)), ch, test.filter, int64(len(test.rdb)))
+			err := rdb.FilterRDB(bufio.NewReader(bytes.NewBufferString(test.rdb)), ch, test.filter, int64(len(test.rdb)))
 			if err != nil {
 				if test.expectedError == nil || test.expectedError != err {
 					t.Errorf("Filtering failed (%s): %v", test.description, err)
@@ -153,7 +161,7 @@ func runRDBBenchmark(b *testing.B, filter func(string) bool) {
 		ch := make(chan []byte)
 
 		go func() {
-			err := FilterRDB(bufio.NewReader(bytes.NewBufferString(RDBFile2)), ch, filter, int64(len(RDBFile2)))
+			err := rdb.FilterRDB(bufio.NewReader(bytes.NewBufferString(RDBFile2)), ch, filter, int64(len(RDBFile2)))
 			close(ch)
 			if err != nil {
 				b.Fatalf("Unable to filter RDB: %v", err)

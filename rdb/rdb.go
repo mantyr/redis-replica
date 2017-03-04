@@ -1,4 +1,4 @@
-package main
+package rdb
 
 // Filter RDB file per spec: https://github.com/sripathikrishnan/redis-rdb-tools/wiki/Redis-RDB-Dump-File-Format
 
@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"github.com/mantyr/redis-replica/rdb/crc64"
 )
 
 const (
@@ -117,7 +118,7 @@ func (filter *RDBFilter) write(data []byte) {
 func (filter *RDBFilter) keepOrDiscard() {
 	if filter.shouldKeep && filter.saved != nil {
 		filter.output <- filter.saved
-		filter.hash = CRC64Update(filter.hash, filter.saved)
+		filter.hash = crc64.CRC64Update(filter.hash, filter.saved)
 		filter.length += int64(len(filter.saved))
 	}
 	filter.saved = nil
