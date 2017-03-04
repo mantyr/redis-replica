@@ -43,9 +43,6 @@ Redis Replica - Redis Resharding Proxy
 .. image:: https://travis-ci.org/mantyr/redis-replica.png?branch=move-rdb-and-cmd
     :target: https://travis-ci.org/mantyr/redis-replica
 
-.. image:: https://coveralls.io/repos/mantyr/redis-replica/badge.png?branch=HEAD
-    :target: https://coveralls.io/r/mantyr/redis-replica?branch=HEAD
-
 Redis Resharding Proxy could be used to split (re-shard) instance of Redis into several smaller instances without interrupting
 normal operations.
 
