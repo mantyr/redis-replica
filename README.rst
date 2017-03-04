@@ -52,7 +52,7 @@ Redis Replica
 Introduction
 ------------
 
-.. image:: https://raw.github.com/smira/redis-resharding-proxy/master/img/redis-resharding.png
+.. image:: https://raw.github.com/smira/redis-resharding-proxy/master/redis-resharding.png
     :width: 500px
 
 Resharding is using Redis built-in `replication <http://redis.io/topics/replication>`_ to transfer data from master Redis node
