@@ -91,6 +91,7 @@ func TestClientCloseWait(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error client.Do(), %q", err)
 	}
+	// иногда падает
 	select {
 		case <- client.WaitClose():
 		case <- func() (chan struct{}) {
@@ -115,13 +116,13 @@ func TestClientHandler(t *testing.T) {
 	
 	test := NewHandlersTest()
 
-	client.Handle(replica.ZADD, func(command *replica.Command) bool {
+	client.Handle("ZADD", func(command *replica.Command) bool {
 //		test.Add(command.Name)
 		return true
 	})
 	client.Do()
 	
-	test.Assert(t, replica.ZADD, 1)
+	test.Assert(t, "ZADD", 1)
 
 	client.WaitClose()
 }
