@@ -1,16 +1,3 @@
-Redis Resharding Proxy
-======================
-
-.. image:: https://travis-ci.org/smira/redis-resharding-proxy.png?branch=master
-    :target: https://travis-ci.org/smira/redis-resharding-proxy
-
-.. image:: https://coveralls.io/repos/smira/redis-resharding-proxy/badge.png?branch=HEAD
-    :target: https://coveralls.io/r/smira/redis-resharding-proxy?branch=HEAD
-
-Redis Resharding Proxy could be used to split (re-shard) instance of Redis into several smaller instances without interrupting
-normal operations.
-
-
 Redis Replica
 =====================
 
@@ -49,6 +36,19 @@ Redis Replica
 
 - server
 
+
+Redis Replica - Redis Resharding Proxy
+======================
+
+.. image:: https://travis-ci.org/mantyr/redis-replica.png?branch=move-rdb-and-cmd
+    :target: https://travis-ci.org/mantyr/redis-replica
+
+.. image:: https://coveralls.io/repos/mantyr/redis-replica/badge.png?branch=HEAD
+    :target: https://coveralls.io/r/mantyr/redis-replica?branch=HEAD
+
+Redis Resharding Proxy could be used to split (re-shard) instance of Redis into several smaller instances without interrupting
+normal operations.
+
 Introduction
 ------------
 
@@ -72,7 +72,7 @@ Installing/building
 
 If you have Go environment ready::
 
-    go get github.com/smira/redis-resharding-proxy
+    go get github.com/mantyr/redis-replica/cmd/redis-resharding-proxy
 
 Otherwise install Go and set up environment::
 
