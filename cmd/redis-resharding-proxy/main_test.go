@@ -17,6 +17,7 @@ func TestReadRedisCommand(t *testing.T) {
 	} else {
 		errorStrconvAtoi = fmt.Errorf("Unable to parse command length: strconv.ParseInt: parsing \"x\": invalid syntax")
 	}
+	fmt.Println(runtime.Version())
 	tests := []struct {
 		description   string
 		input         string
