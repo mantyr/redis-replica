@@ -7,9 +7,18 @@ import (
 	"io"
 	"reflect"
 	"testing"
+	"runtime"
+	"strings"
 )
 
 func TestReadRedisCommand(t *testing.T) {
+	var errorStrconvAtoi error
+	if strings.Contains(runtime.Version(), "devel") {
+		errorStrconvAtoi = fmt.Errorf("Unable to parse command length: strconv.Atoi: parsing \"x\": invalid syntax")
+	} else {
+		errorStrconvAtoi = fmt.Errorf("Unable to parse command length: strconv.ParseInt: parsing \"x\": invalid syntax")
+	}
+
 	tests := []struct {
 		description   string
 		input         string
@@ -68,7 +77,7 @@ func TestReadRedisCommand(t *testing.T) {
 			description:   "9: Unparsable length",
 			input:         "*x\r\n",
 			expected:      redisCommand{},
-			expectedError: fmt.Errorf("Unable to parse command length: strconv.ParseInt: parsing \"x\": invalid syntax"),
+			expectedError: errorStrconvAtoi,
 		},
 	}
 

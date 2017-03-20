@@ -1,4 +1,4 @@
-package main
+package rdb
 
 // Filter RDB file per spec: https://github.com/sripathikrishnan/redis-rdb-tools/wiki/Redis-RDB-Dump-File-Format
 
@@ -10,10 +10,12 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"github.com/mantyr/redis-replica/rdb/crc64"
 )
 
 const (
 	rdbOpDB         = 0xFE
+	rdbAuxFields    = 0xFA
 	rdbOpExpirySec  = 0xFD
 	rdbOpExpiryMSec = 0xFC
 	rdbOpEOF        = 0xFF
@@ -95,7 +97,7 @@ func FilterRDB(reader *bufio.Reader, output chan<- []byte, dissector func(string
 func (filter *RDBFilter) safeRead(n uint32) (result []byte, err error) {
 	result = make([]byte, n)
 	_, err = io.ReadFull(filter.reader, result)
-	return
+	return result, err
 }
 
 // Accumulate some data that might be either filtered out or passed through
@@ -116,7 +118,7 @@ func (filter *RDBFilter) write(data []byte) {
 func (filter *RDBFilter) keepOrDiscard() {
 	if filter.shouldKeep && filter.saved != nil {
 		filter.output <- filter.saved
-		filter.hash = CRC64Update(filter.hash, filter.saved)
+		filter.hash = crc64.CRC64Update(filter.hash, filter.saved)
 		filter.length += int64(len(filter.saved))
 	}
 	filter.saved = nil
@@ -378,7 +380,7 @@ func stateMagic(filter *RDBFilter) (state, error) {
 		return nil, ErrWrongSignature
 	}
 
-	if version > 6 {
+	if version > 7 {
 		return nil, ErrVersionUnsupported
 	}
 
@@ -398,6 +400,9 @@ func stateOp(filter *RDBFilter) (state, error) {
 	filter.currentOp = op
 
 	switch op {
+	case rdbAuxFields:
+		filter.valueState = stateSkipString
+		return stateKey, nil
 	case rdbOpDB:
 		filter.keepOrDiscard()
 		return stateDB, nil

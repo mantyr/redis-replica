@@ -1,4 +1,4 @@
-package main
+package crc64
 
 // Redis version of CRC64
 

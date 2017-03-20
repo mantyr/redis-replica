@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"github.com/mantyr/redis-replica/rdb"
 )
 
 var (
@@ -150,7 +151,7 @@ func masterConnection(slavechannel chan<- []byte, masterchannel <-chan []byte) {
 
 			slavechannel <- command.raw
 
-			err = FilterRDB(reader, slavechannel, func(key string) bool { return keyRegexp.FindStringIndex(key) != nil }, command.bulkSize)
+			err = rdb.FilterRDB(reader, slavechannel, func(key string) bool { return keyRegexp.FindStringIndex(key) != nil }, command.bulkSize)
 			if err != nil {
 				log.Printf("Unable to read RDB: %v\n", err)
 				return
